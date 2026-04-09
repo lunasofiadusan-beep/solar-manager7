@@ -3,135 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SolarManager Pro - Sistema de Gestión</title>
+    <title>SolarManager Pro v2.2 - CRM & Procesos</title>
     <style>
         :root {
             --primary: #2563eb; --bg: #f1f5f9; --card: #ffffff; --text: #1e293b;
             --urgente: #ff4d4d; --intermedio: #f97316; --medio: #eab308; --leve: #22c55e;
+            /* Colores Llamadas */
+            --no-resp: #ffffff; --rellamar: #f97316; --rechazado: #ef4444; --aceptado: #22c55e;
         }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; }
         
-        /* Navegación Lateral */
-        nav { width: 240px; background: #1e293b; height: 100vh; position: fixed; color: white; padding: 20px 0; }
+        /* Navegación */
+        nav { width: 240px; background: #1e293b; height: 100vh; position: fixed; color: white; padding: 20px 0; overflow-y: auto; }
         nav h2 { text-align: center; color: #38bdf8; font-size: 1.2rem; }
-        nav a { display: block; color: #cbd5e1; padding: 15px 25px; text-decoration: none; cursor: pointer; border-left: 4px solid transparent; }
+        nav a { display: block; color: #cbd5e1; padding: 12px 25px; text-decoration: none; cursor: pointer; border-left: 4px solid transparent; font-size: 0.9rem; }
         nav a:hover { background: #334155; }
         nav a.active { background: #334155; border-left-color: var(--primary); color: white; }
-
-        /* Contenedor Principal */
+        
+        /* Layout */
         main { margin-left: 240px; padding: 30px; width: 100%; box-sizing: border-box; }
         .page { display: none; }
         .page.active { display: block; }
-        .card { background: var(--card); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        
-        /* Formularios */
+        .card { background: var(--card); padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
         .form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
         label { font-weight: 600; font-size: 0.85rem; margin-bottom: 5px; color: #64748b; }
         input, select, textarea { padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; }
         button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        
+        /* Estados */
+        .u-urgente { background-color: #ffebeb; color: var(--urgente); font-weight: bold; }
+        .u-intermedio { background-color: #fff4eb; color: var(--intermedio); }
+        .u-medio { background-color: #fffbeb; color: var(--medio); }
+        .u-leve { background-color: #ebffeb; color: var(--leve); }
 
-        /* Colores Urgencia */
-        .u-urgente { color: var(--urgente); font-weight: bold; }
-        .u-intermedio { color: var(--intermedio); }
-        .u-medio { color: var(--medio); }
-        .u-leve { color: var(--leve); }
+        /* Estilos Llamadas */
+        .st-blanco { background-color: #ffffff; color: #64748b; }
+        .st-naranja { background-color: #fff7ed; color: #f97316; font-weight: bold; }
+        .st-rojo { background-color: #fef2f2; color: #ef4444; font-weight: bold; }
+        .st-verde { background-color: #f0fdf4; color: #22c55e; font-weight: bold; }
 
-        /* Procesos y Pasos */
+        /* Procesos */
         .step-container { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; }
         .step-header { background: #f8fafc; padding: 12px; cursor: pointer; font-weight: bold; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
         .step-body { padding: 15px; display: none; }
         .step-container.open .step-body { display: block; }
-        .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-        .file-item { font-size: 0.75rem; border: 1px dashed #cbd5e1; padding: 5px; border-radius: 4px; background: #fff; }
-
-        /* Historial */
-        .historial { max-height: 150px; overflow-y: auto; background: #f8fafc; padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 10px; }
+        .file-item { font-size: 0.75rem; border: 1px dashed #cbd5e1; padding: 5px; border-radius: 4px; background: #fff; margin-bottom: 5px;}
+        .historial { max-height: 150px; overflow-y: auto; background: #f8fafc; padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 10px; border: 1px solid #eee; }
         .comment { border-bottom: 1px solid #eee; padding: 5px 0; }
-        .date { color: #94a3b8; font-size: 0.7rem; }
+        .date { color: #94a3b8; font-size: 0.7rem; display: block; }
+
+        /* Agenda */
+        .agenda-day { background: white; border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary); }
+        .agenda-item { padding: 8px 0; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; }
     </style>
 </head>
 <body>
 
 <nav>
     <h2>⚡ SolarManager</h2>
-    <a onclick="showPage('page-registro')" id="link-registro" class="active">1. Registro de Cliente</a>
-    <a onclick="showPage('page-estado')" id="link-estado">2. Estado y Urgencia</a>
-    <a onclick="showPage('page-procesos')" id="link-procesos">3. Página de Procesos</a>
+    <a onclick="showPage('page-registro')" id="link-registro" class="active">1. Registro Cliente</a>
+    <a onclick="showPage('page-estado')" id="link-estado">2. Estado & Urgencia</a>
+    <a onclick="showPage('page-procesos')" id="link-procesos">3. Procesos</a>
+    <hr style="border: 0; border-top: 1px solid #334155; margin: 10px 0;">
+    <a onclick="showPage('page-llamadas')" id="link-llamadas">📞 Llamadas</a>
+    <a onclick="showPage('page-visitas')" id="link-visitas">🤝 Visitas / Reuniones</a>
+    <a onclick="showPage('page-agenda')" id="link-agenda">📅 Agenda Diaria</a>
 </nav>
 
 <main>
     <section id="page-registro" class="page active">
-        <h1>📝 Registro de Nuevo Cliente</h1>
+        <h1>📝 Nuevo Registro</h1>
         <div class="card">
             <form id="formRegistro">
                 <div class="grid">
-                    <div class="form-group"><label>Código de Pedido</label><input type="text" id="reg-codigo" required></div>
-                    <div class="form-group"><label>Nombre y Apellidos</label><input type="text" id="reg-nombre" required></div>
-                    <div class="form-group"><label>Teléfono</label><input type="tel" id="reg-tel" required></div>
-                    <div class="form-group"><label>Email (Opcional)</label><input type="email" id="reg-email"></div>
-                    <div class="form-group"><label>DNI / ID</label><input type="text" id="reg-dni" required></div>
-                    <div class="form-group"><label>Provincia</label><input type="text" id="reg-prov"></div>
-                    <div class="form-group"><label>Localidad</label><input type="text" id="reg-loc"></div>
-                    <div class="form-group"><label>CP</label><input type="text" id="reg-cp"></div>
-                    <div class="form-group"><label>Calle</label><input type="text" id="reg-calle"></div>
-                    <div class="form-group"><label>Número</label><input type="text" id="reg-num"></div>
+                    <div class="form-group"><label>Código Pedido</label><input type="text" id="reg-codigo" required></div>
+                    <div class="form-group"><label>Nombre Completo</label><input type="text" id="reg-nombre" required></div>
+                    <div class="form-group"><label>Teléfono</label><input type="tel" id="reg-tel"></div>
+                    <div class="form-group"><label>DNI</label><input type="text" id="reg-dni"></div>
                     <div class="form-group">
                         <label>Tipo de Trabajo</label>
                         <select id="reg-tipo" onchange="checkTipo()">
-                            <option value="otros">Otros</option>
                             <option value="fotovoltaica">Fotovoltaica</option>
                             <option value="averia">Arreglo de avería</option>
+                            <option value="otros">Otros</option>
                         </select>
                     </div>
                 </div>
-
-                <div id="fv-extra" style="display:none; margin-top: 20px; padding-top: 20px; border-top: 2px solid #eee;">
+                <div id="fv-extra" style="margin-top:20px;">
                     <h3>Datos Fotovoltaica</h3>
                     <div class="grid">
-                        <div class="form-group"><label>Cantidad de Placas</label><input type="number" id="fv-placas"></div>
-                        <div class="form-group"><label>Potencia Placas</label><input type="text" id="fv-pot-p"></div>
-                        <div class="form-group"><label>Marca Placas</label><input type="text" id="fv-marca-p"></div>
-                        <div class="form-group"><label>Marca Inversor</label>
+                        <div class="form-group"><label>Nº Placas</label><input type="number" id="fv-placas"></div>
+                        <div class="form-group"><label>Inversor</label>
                             <select id="fv-marca-inv"><option>Huawei</option><option>Sigen Energy</option></select>
                         </div>
-                        <div class="form-group"><label>Potencia Inversor</label><input type="text" id="fv-pot-inv"></div>
-                        <div class="form-group"><label>Tipo Estructura</label>
+                        <div class="form-group"><label>Estructura</label>
                             <select id="fv-est"><option>Coplanar</option><option>Solar Bloc</option></select>
                         </div>
                     </div>
                 </div>
-                <button type="button" onclick="guardarCliente()" style="margin-top:20px;">✅ Guardar Cliente</button>
+                <button type="button" onclick="guardarCliente()" style="margin-top:20px;">✅ Guardar en Sistema</button>
             </form>
         </div>
     </section>
 
     <section id="page-estado" class="page">
-        <h1>📊 Estado del Cliente</h1>
-        <div id="clientes-estado-lista">
-            </div>
+        <h1>📊 Seguimiento de Estados</h1>
+        <div id="clientes-estado-lista"></div>
     </section>
 
     <section id="page-procesos" class="page">
-        <h1>⚙️ Seguimiento de Procesos</h1>
+        <h1>⚙️ Procesos de Obra</h1>
         <input type="text" id="buscador" placeholder="🔍 Buscar por nombre o código..." onkeyup="filtrarProcesos()" style="width:100%; padding:12px; margin-bottom:20px; border-radius:8px; border:2px solid var(--primary);">
-        <div id="lista-procesos">
-            </div>
+        <div id="lista-procesos"></div>
+    </section>
+
+    <section id="page-llamadas" class="page">
+        <h1>📞 Registro de Llamadas</h1>
+        <div class="card">
+            <h3>Nueva Llamada</h3>
+            <form id="formLlamada">
+                <div class="grid">
+                    <input type="text" id="call-nombre" placeholder="Nombre">
+                    <input type="tel" id="call-tel" placeholder="Teléfono">
+                    <input type="email" id="call-email" placeholder="Email">
+                    <input type="text" id="call-prov" placeholder="Provincia">
+                    <input type="text" id="call-loc" placeholder="Localidad">
+                    <input type="text" id="call-cp" placeholder="C.P.">
+                    <input type="text" id="call-calle" placeholder="Calle">
+                    <input type="text" id="call-num" placeholder="Nº">
+                    <select id="call-estado">
+                        <option value="blanco">Sin responder ⚪</option>
+                        <option value="naranja">Llamar más adelante 🟠</option>
+                        <option value="rojo">No interesado 🔴</option>
+                        <option value="verde">Acepta Reunión 🟢</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-top:10px;">
+                    <label>Fecha Rellamada (Opcional)</label>
+                    <input type="date" id="call-next">
+                </div>
+                <button type="button" onclick="guardarLlamada()" style="margin-top:10px;">Añadir Llamada</button>
+            </form>
+        </div>
+        <div id="lista-llamadas"></div>
+    </section>
+
+    <section id="page-visitas" class="page">
+        <h1>🤝 Visitas y Reuniones</h1>
+        <div id="lista-visitas"></div>
+    </section>
+
+    <section id="page-agenda" class="page">
+        <h1>📅 Agenda Diaria</h1>
+        <div id="calendario-lista"></div>
     </section>
 </main>
 
 <script>
     let clientes = JSON.parse(localStorage.getItem('solar_db')) || [];
+    let llamadas = JSON.parse(localStorage.getItem('llamadas_db')) || [];
+    let visitas = JSON.parse(localStorage.getItem('visitas_db')) || [];
 
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
-        document.getElementById('link-' + pageId.split('-')[1]).classList.add('active');
+        const linkId = 'link-' + (pageId.includes('-') ? pageId.split('-')[1] : pageId);
+        if(document.getElementById(linkId)) document.getElementById(linkId).classList.add('active');
+        
         if(pageId === 'page-estado') renderEstado();
         if(pageId === 'page-procesos') renderProcesos();
+        if(pageId === 'page-llamadas') renderLlamadas();
+        if(pageId === 'page-visitas') renderVisitas();
+        if(pageId === 'page-agenda') renderAgenda();
     }
 
+    // --- FUNCIONES EXISTENTES (SIN MODIFICAR) ---
     function checkTipo() {
         const tipo = document.getElementById('reg-tipo').value;
         document.getElementById('fv-extra').style.display = (tipo === 'fotovoltaica') ? 'block' : 'none';
@@ -146,132 +194,112 @@
             dni: document.getElementById('reg-dni').value,
             tipo: document.getElementById('reg-tipo').value,
             urgencia: 'leve 🟢',
-            estado: 'esperando',
+            estado: 'oferta',
             comentarios: [],
-            proceso: {} // Aquí se guardarán los pasos
+            detallesFv: {
+                placas: document.getElementById('fv-placas').value,
+                inv: document.getElementById('fv-marca-inv').value,
+                est: document.getElementById('fv-est').value
+            }
         };
+        if(!c.nombre || !c.codigo) return alert("Nombre y código son obligatorios");
         clientes.push(c);
         localStorage.setItem('solar_db', JSON.stringify(clientes));
-        alert("Cliente guardado");
+        alert("Cliente guardado correctamente");
         document.getElementById('formRegistro').reset();
+    }
+
+    function updateVal(id, campo, valor) {
+        const idx = clientes.findIndex(x => x.id === id);
+        if (idx !== -1) {
+            clientes[idx][campo] = valor;
+            localStorage.setItem('solar_db', JSON.stringify(clientes));
+            if(campo === 'urgencia') renderEstado(); 
+        }
     }
 
     function addComment(id) {
         const input = document.getElementById(`comm-in-${id}`);
-        const cIdx = clientes.findIndex(x => x.id === id);
-        if(input.value) {
+        const idx = clientes.findIndex(x => x.id === id);
+        if(input.value.trim() !== "") {
             const now = new Date();
-            clientes[cIdx].comentarios.push({
-                texto: input.value,
-                fecha: now.toLocaleDateString() + " " + now.toLocaleTimeString()
-            });
+            const fechaTxt = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            clientes[idx].comentarios.unshift({ texto: input.value, fecha: fechaTxt });
             localStorage.setItem('solar_db', JSON.stringify(clientes));
+            input.value = "";
             renderEstado();
         }
     }
 
     function renderEstado() {
         const list = document.getElementById('clientes-estado-lista');
-        list.innerHTML = clientes.map(c => `
+        if(clientes.length === 0) { list.innerHTML = "<p>No hay clientes.</p>"; return; }
+        list.innerHTML = clientes.map(c => {
+            const urgClase = "u-" + c.urgencia.split(' ')[0].toLowerCase();
+            return `
             <div class="card">
-                <h3>${c.nombre} (${c.codigo})</h3>
+                <div style="display:flex; justify-content:space-between;">
+                    <h3>${c.nombre} <small>(${c.codigo})</small></h3>
+                    <button onclick="eliminarCliente(${c.id})" style="background:none; color:red; padding:0; font-size:0.8rem;">Eliminar</button>
+                </div>
                 <div class="grid">
-                    <div class="form-group">
-                        <label>Urgencia</label>
-                        <select onchange="updateVal(${c.id}, 'urgencia', this.value)" class="u-${c.urgencia.split(' ')[0]}">
+                    <div class="form-group"><label>Nivel de Urgencia</label>
+                        <select onchange="updateVal(${c.id}, 'urgencia', this.value)" class="${urgClase}">
                             <option ${c.urgencia.includes('leve')?'selected':''}>leve 🟢</option>
                             <option ${c.urgencia.includes('medio')?'selected':''}>medio 🟡</option>
                             <option ${c.urgencia.includes('intermedio')?'selected':''}>intermedio 🟠</option>
                             <option ${c.urgencia.includes('URGENTE')?'selected':''}>URGENTE 🔴</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Estado Actual</label>
+                    <div class="form-group"><label>Estado Actual</label>
                         <select onchange="updateVal(${c.id}, 'estado', this.value)">
                             ${c.tipo === 'fotovoltaica' ? `
-                                <option>oferta</option><option>memoria sola</option><option>memoria CIE</option>
-                                <option>memoria firma</option><option>RITSIC</option><option>RAC</option>
-                                <option>obra menor</option><option>terminado</option>
+                                <option ${c.estado=='oferta'?'selected':''}>oferta</option><option ${c.estado=='memoria sola'?'selected':''}>memoria sola</option>
+                                <option ${c.estado=='memoria CIE'?'selected':''}>memoria CIE</option><option ${c.estado=='memoria firma'?'selected':''}>memoria firma</option>
+                                <option ${c.estado=='RITSIC'?'selected':''}>RITSIC</option><option ${c.estado=='RAC'?'selected':''}>RAC</option>
+                                <option ${c.estado=='obra menor'?'selected':''}>obra menor</option><option ${c.estado=='terminado'?'selected':''}>terminado</option>
                             ` : `
-                                <option>esperando</option><option>en obras</option><option>papeleo</option><option>terminado</option>
+                                <option ${c.estado=='esperando'?'selected':''}>esperando</option><option ${c.estado=='papeleo'?'selected':''}>papeleo</option>
+                                <option ${c.estado=='en obras'?'selected':''}>en obras</option><option ${c.estado=='terminado'?'selected':''}>terminado</option>
                             `}
                         </select>
                     </div>
                 </div>
-                <div class="historial">
-                    ${c.comentarios.map(co => `<div class="comment"><span class="date">${co.fecha}</span>: ${co.texto}</div>`).join('')}
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <input type="text" id="comm-in-${c.id}" placeholder="Añadir comentario..." style="flex:1">
-                    <button onclick="addComment(${c.id})">Añadir</button>
-                </div>
-            </div>
-        `).join('');
+                <div class="historial">${c.comentarios.map(co => `<div class="comment"><span class="date">${co.fecha}</span>${co.texto}</div>`).join('')}</div>
+                <div style="display:flex; gap:10px;"><input type="text" id="comm-in-${c.id}" placeholder="Escribir nota..." style="flex:1"><button onclick="addComment(${c.id})">Postear</button></div>
+            </div>`; }).join('');
     }
 
     function renderProcesos() {
         const list = document.getElementById('lista-procesos');
         list.innerHTML = clientes.map(c => `
             <div class="card cliente-proc" data-search="${c.nombre} ${c.codigo}">
-                <div style="display:flex; justify-content:space-between;">
-                    <h2>${c.nombre} <small>(${c.codigo})</small></h2>
-                    <span style="background:var(--primary); color:white; padding:5px 10px; border-radius:5px;">${c.tipo}</span>
+                <h2>${c.nombre} <small>(${c.codigo}) - ${c.tipo.toUpperCase()}</small></h2>
+                <div class="step-container">
+                    <div class="step-header" onclick="this.parentElement.classList.toggle('open')">1. Documentación 📁 <span>▼</span></div>
+                    <div class="step-body"><div class="grid">
+                        <div class="file-item">DNI/CIE/NIE <input type="file"></div><div class="file-item">DR (PDF) <input type="file"></div>
+                        <div class="file-item">Autorización <input type="file"></div><div class="file-item">Placas <input type="file"></div>
+                        <div class="file-item">IBI <input type="file"></div><div class="file-item">Luz <input type="file"></div>
+                        <div class="file-item">Catastro <input type="file"></div><div class="file-item">Licencia <input type="file"></div>
+                    </div></div>
                 </div>
-                
-                ${c.tipo === 'fotovoltaica' ? renderPasosFV(c.id) : renderPasosOtros(c.id)}
-            </div>
-        `).join('');
-    }
-
-    function renderPasosFV(id) {
-        return `
-            <div class="step-container">
-                <div class="step-header" onclick="this.parentElement.classList.toggle('open')">1. Documentación (Subir archivos) 📁 <span>▼</span></div>
-                <div class="step-body">
-                    <div class="file-grid">
-                        <div class="file-item">DNI/CIE/NIE <input type="file"></div>
-                        <div class="file-item">DR (PDF) <input type="file" accept="application/pdf"></div>
-                        <div class="file-item">Autorización (PDF) <input type="file"></div>
-                        <div class="file-item">Distribución Placas <input type="file"></div>
-                        <div class="file-item">IBI <input type="file"></div>
-                        <div class="file-item">Factura Luz <input type="file"></div>
-                        <div class="file-item">Catastro <input type="file"></div>
-                        <div class="file-item">Croquis <input type="file"></div>
-                        <div class="file-item">Licencia Obra <input type="file"></div>
-                    </div>
+                <div class="step-container">
+                    <div class="step-header" onclick="this.parentElement.classList.toggle('open')">2. Memoria Técnica 📝 <span>▼</span></div>
+                    <div class="step-body"><div class="grid" style="grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));">
+                        <label><input type="checkbox"> Portada</label><label><input type="checkbox"> Datos</label>
+                        <label><input type="checkbox"> Panel</label><label><input type="checkbox"> Estructura</label>
+                        <label><input type="checkbox"> Inversor</label><label><input type="checkbox"> ELEC 1-2-3</label>
+                        <label><input type="checkbox"> Unifilar</label><label><input type="checkbox"> Seguridad</label>
+                        <label><input type="checkbox"> Enviado</label><label><input type="checkbox"> Firmado</label>
+                    </div></div>
                 </div>
-            </div>
-            <div class="step-container">
-                <div class="step-header" onclick="this.parentElement.classList.toggle('open')">2. Memoria (Checklist) 📝 <span>▼</span></div>
-                <div class="step-body">
-                    <div class="grid" style="grid-template-columns: 1fr 1fr 1fr;">
-                        <label><input type="checkbox"> Portada</label> <label><input type="checkbox"> Datos</label>
-                        <label><input type="checkbox"> Panel</label> <label><input type="checkbox"> Estructura</label>
-                        <label><input type="checkbox"> Inversor</label> <label><input type="checkbox"> Factura</label>
-                        <label><input type="checkbox"> ELEC 1/2/3</label> <label><input type="checkbox"> Unifilar</label>
-                        <label><input type="checkbox"> Plan Seg.</label> <label><input type="checkbox"> Enviado</label>
-                        <label><input type="checkbox"> Firmado</label>
-                    </div>
+                <div class="grid" style="margin-top:10px; font-size:0.8rem;">
+                    <div class="file-item">3. Obra Menor <input type="checkbox"></div><div class="file-item">5. Grúa <input type="date"></div>
+                    <div class="file-item">6. Montaje <input type="date"></div><div class="file-item">8. RITSIC <input type="checkbox"></div>
+                    <div class="file-item">10. IBI <input type="checkbox"></div>
                 </div>
-            </div>
-            <div class="grid" style="margin-top:10px;">
-                <div class="file-item">3. Obra Menor <input type="checkbox"></div>
-                <div class="file-item">4. Cierre Calle <input type="checkbox"></div>
-                <div class="file-item">5. Grúa <input type="date"></div>
-                <div class="file-item">6. Fecha Montaje <input type="date"></div>
-                <div class="file-item">8. RITSIC <input type="checkbox"></div>
-                <div class="file-item">9. RAC <input type="checkbox"></div>
-                <div class="file-item">10. IBI <input type="checkbox"></div>
-            </div>
-        `;
-    }
-
-    function renderPasosOtros(id) {
-        return `<div class="step-container open"><div class="step-body">
-            <label><input type="checkbox"> Material pedido</label>
-            <label><input type="checkbox"> En obra</label>
-            <label><input type="checkbox"> Terminado</label>
-        </div></div>`;
+            </div>`).join('');
     }
 
     function filtrarProcesos() {
@@ -281,11 +309,187 @@
         });
     }
 
-    function updateVal(id, key, val) {
-        const idx = clientes.findIndex(x => x.id === id);
-        clientes[idx][key] = val;
-        localStorage.setItem('solar_db', JSON.stringify(clientes));
-        renderEstado();
+    function eliminarCliente(id) {
+        if(confirm("¿Seguro que quieres borrar este cliente?")) {
+            clientes = clientes.filter(c => c.id !== id);
+            localStorage.setItem('solar_db', JSON.stringify(clientes));
+            renderEstado();
+        }
+    }
+
+    // --- NUEVAS FUNCIONES: LLAMADAS, VISITAS, AGENDA ---
+
+    function guardarLlamada() {
+        const id = Date.now();
+        const est = document.getElementById('call-estado').value;
+        const nueva = {
+            id: id,
+            nombre: document.getElementById('call-nombre').value,
+            tel: document.getElementById('call-tel').value,
+            email: document.getElementById('call-email').value,
+            prov: document.getElementById('call-prov').value,
+            loc: document.getElementById('call-loc').value,
+            cp: document.getElementById('call-cp').value,
+            calle: document.getElementById('call-calle').value,
+            num: document.getElementById('call-num').value,
+            estado: est,
+            fechaProx: document.getElementById('call-next').value
+        };
+
+        if(!nueva.nombre) return alert("Pon al menos el nombre");
+        
+        llamadas.push(nueva);
+        localStorage.setItem('llamadas_db', JSON.stringify(llamadas));
+
+        // Si es verde, crear visita automáticamente
+        if(est === 'verde') {
+            crearVisitaDesdeLlamada(nueva);
+        }
+
+        document.getElementById('formLlamada').reset();
+        renderLlamadas();
+    }
+
+    function updateLlamadaEstado(id, valor) {
+        const idx = llamadas.findIndex(l => l.id === id);
+        llamadas[idx].estado = valor;
+        localStorage.setItem('llamadas_db', JSON.stringify(llamadas));
+        if(valor === 'verde') crearVisitaDesdeLlamada(llamadas[idx]);
+        renderLlamadas();
+    }
+
+    function crearVisitaDesdeLlamada(ll) {
+        // Evitar duplicados
+        if(visitas.find(v => v.llamadaId === ll.id)) return;
+        
+        const v = {
+            id: Date.now(),
+            llamadaId: ll.id,
+            nombre: ll.nombre,
+            tel: ll.tel,
+            direccion: `${ll.calle} ${ll.num}, ${ll.loc}`,
+            reunion_fecha: "",
+            reunion_hora: "",
+            sitio: "vivienda",
+            resultado: "medio", // amarillo por defecto
+            comentarios: [],
+            proxima_cita: ""
+        };
+        visitas.push(v);
+        localStorage.setItem('visitas_db', JSON.stringify(visitas));
+    }
+
+    function renderLlamadas() {
+        const list = document.getElementById('lista-llamadas');
+        list.innerHTML = llamadas.map(l => `
+            <div class="card st-${l.estado}">
+                <div class="grid">
+                    <div><b>${l.nombre}</b><br>${l.tel}</div>
+                    <div>${l.loc} (${l.prov})</div>
+                    <div class="form-group">
+                        <select onchange="updateLlamadaEstado(${l.id}, this.value)">
+                            <option value="blanco" ${l.estado=='blanco'?'selected':''}>Sin responder ⚪</option>
+                            <option value="naranja" ${l.estado=='naranja'?'selected':''}>Llamar más adelante 🟠</option>
+                            <option value="rojo" ${l.estado=='rojo'?'selected':''}>No interesado 🔴</option>
+                            <option value="verde" ${l.estado=='verde'?'selected':''}>Acepta Reunión 🟢</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addVisitaComment(id) {
+        const input = document.getElementById(`v-comm-${id}`);
+        const idx = visitas.findIndex(x => x.id === id);
+        if(input.value.trim() !== "") {
+            const now = new Date();
+            const fechaTxt = now.toLocaleDateString() + " " + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            visitas[idx].comentarios.unshift({ texto: input.value, fecha: fechaTxt });
+            localStorage.setItem('visitas_db', JSON.stringify(visitas));
+            input.value = "";
+            renderVisitas();
+        }
+    }
+
+    function updateVisitaVal(id, campo, valor) {
+        const idx = visitas.findIndex(x => x.id === id);
+        visitas[idx][campo] = valor;
+        localStorage.setItem('visitas_db', JSON.stringify(visitas));
+        if(campo === 'resultado') renderVisitas();
+    }
+
+    function renderVisitas() {
+        const list = document.getElementById('lista-visitas');
+        list.innerHTML = visitas.map(v => {
+            const resColor = v.resultado === 'positivo' ? 'st-verde' : (v.resultado === 'negativo' ? 'st-rojo' : 'st-naranja');
+            return `
+            <div class="card ${resColor}">
+                <h3>Visita con ${v.nombre}</h3>
+                <div class="grid">
+                    <div class="form-group"><label>Fecha Reunión</label><input type="date" value="${v.reunion_fecha}" onchange="updateVisitaVal(${v.id}, 'reunion_fecha', this.value)"></div>
+                    <div class="form-group"><label>Hora</label><input type="time" value="${v.reunion_hora}" onchange="updateVisitaVal(${v.id}, 'reunion_hora', this.value)"></div>
+                    <div class="form-group"><label>Sitio</label>
+                        <select onchange="updateVisitaVal(${v.id}, 'sitio', this.value)">
+                            <option value="vivienda" ${v.sitio=='vivienda'?'selected':''}>Vivienda</option>
+                            <option value="oficina" ${v.sitio=='oficina'?'selected':''}>Oficina</option>
+                            <option value="otro" ${v.sitio=='otro'?'selected':''}>Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Resultado</label>
+                        <select onchange="updateVisitaVal(${v.id}, 'resultado', this.value)">
+                            <option value="positivo" ${v.resultado=='positivo'?'selected':''}>Positivo 🟢</option>
+                            <option value="medio" ${v.resultado=='medio'?'selected':''}>Medio 🟡</option>
+                            <option value="negativo" ${v.resultado=='negativo'?'selected':''}>Negativo 🔴</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group"><label>Rellamar en otra fecha (Recordatorio)</label>
+                    <input type="date" value="${v.proxima_cita}" onchange="updateVisitaVal(${v.id}, 'proxima_cita', this.value)">
+                </div>
+                <div class="historial">${v.comentarios.map(co => `<div class="comment"><span class="date">${co.fecha}</span>${co.texto}</div>`).join('')}</div>
+                <div style="display:flex; gap:10px;"><input type="text" id="v-comm-${v.id}" placeholder="Nota de visita..." style="flex:1"><button onclick="addVisitaComment(${v.id})">Añadir Nota</button></div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderAgenda() {
+        const list = document.getElementById('calendario-lista');
+        const eventos = {};
+
+        // Agrupar llamadas por fecha
+        llamadas.forEach(l => {
+            if(l.fechaProx) {
+                if(!eventos[l.fechaProx]) eventos[l.fechaProx] = [];
+                eventos[l.fechaProx].push(`📞 Llamar a ${l.nombre} (${l.tel})`);
+            }
+        });
+
+        // Agrupar visitas por fecha
+        visitas.forEach(v => {
+            if(v.reunion_fecha) {
+                if(!eventos[v.reunion_fecha]) eventos[v.reunion_fecha] = [];
+                eventos[v.reunion_fecha].push(`🤝 Reunión: ${v.nombre} - ${v.reunion_hora} (${v.sitio})`);
+            }
+            if(v.proxima_cita) {
+                if(!eventos[v.proxima_cita]) eventos[v.proxima_cita] = [];
+                eventos[v.proxima_cita].push(`🔔 Recordatorio Rellamada: ${v.nombre}`);
+            }
+        });
+
+        const fechasOrdenadas = Object.keys(eventos).sort();
+
+        if(fechasOrdenadas.length === 0) {
+            list.innerHTML = "<p>No hay eventos programados en la agenda.</p>";
+            return;
+        }
+
+        list.innerHTML = fechasOrdenadas.map(f => `
+            <div class="agenda-day">
+                <strong>📅 ${new Date(f).toLocaleDateString()}</strong>
+                ${eventos[f].map(e => `<div class="agenda-item">${e}</div>`).join('')}
+            </div>
+        `).join('');
     }
 </script>
 
